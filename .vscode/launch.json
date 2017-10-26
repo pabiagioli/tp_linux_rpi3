@@ -1,0 +1,28 @@
+{
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "(gdb) Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceRoot}/a.out",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "gdb",
+                //"miDebuggerPath": "/usr/bin/gdb",
+                "miDebuggerPath": "/home/pampa/linux-embedded-labs/xtools/aarch64-rpi3-linux-gnu/bin/aarch64-rpi3-gdb",
+                "miDebuggerServerAddress": "192.168.7.101:2345",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+                //"preLaunchTask": "build-rpi3"
+            }
+        ]
+    }

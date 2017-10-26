@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "queue.h": "c",
+        "list.h": "c",
+        "jsmn.h": "c",
+        "dirent.h": "c",
+        "types.h": "c",
+        "stdio.h": "c",
+        "unistd.h": "c",
+        "stat.h": "c",
+        "errno.h": "c",
+        "errno-base.h": "c"
+    }
+}

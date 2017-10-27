@@ -1,0 +1,16 @@
+#!/bin/sh
+
+VERSION=`uname -a`
+SERVERDATE=`date`
+
+echo "Content-type:application/json"
+echo ""
+echo '{ "uname":"' $VERSION '", "serverdate":"' $SERVERDATE '"}'
+
+
+
+
+#echo `uname -a`
+#echo "\"serverdate\":
+#echo `date`
+

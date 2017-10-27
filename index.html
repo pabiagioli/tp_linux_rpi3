@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>RPi3 HTTP Server</title>
+</head>
+<body>
+  <h1>Linux Embebido</h1>
+  <h2>Version:</h2>
+  <p id="uname"></p>
+  <h3>Browser Date</h3>
+  <p id="mydate"></p>
+  <h3>Server Date</h3>
+  <p id="serverdate"></p>
+
+  <h3>LEDs</h3>
+  <form id="ledForm">
+  </form>
+  
+</body>
+
+<script type="text/javascript">
+
+var xhr1 = new XMLHttpRequest();
+xhr1.withCredentials = true;
+
+var xhr2 = new XMLHttpRequest();
+xhr2.withCredentials = true;
+
+xhr1.addEventListener("readystatechange", function () {
+  if (this.readyState === 4) {
+    //console.log(this.responseText);
+    var obj = JSON.parse(this.responseText)
+    document.getElementById('uname').innerHTML = obj.uname;
+    document.getElementById('mydate').innerHTML = (new Date()).toString();
+    document.getElementById('serverdate').innerHTML = obj.serverdate;
+  }
+});
+
+xhr2.addEventListener("readystatechange", function () {
+  if (this.readyState === 4) {
+    //console.log(this.responseText);
+    var obj = JSON.parse(this.responseText)
+    var ledForm = document.getElementById('ledForm');
+    removeFormData(ledForm);
+    
+    obj.forEach(function(element) {
+       
+      var triggers = element.triggers.trim().split(" ");
+      var ledLabel = document.createElement("label");
+      var ledTriggersElem = document.createElement("select");
+      
+      ledLabel.innerText = element.led;
+      triggers.forEach(function(trig){ 
+        if(trig.startsWith("[") && trig.endsWith("]")){
+          var selected = trig.replace("[","").replace("]","");
+          ledTriggersElem.appendChild(new Option(selected, element.led+","+selected, true, true));
+        }else
+          ledTriggersElem.appendChild(new Option(trig,element.led+","+trig));
+        },this);
+      
+      document.getElementById('ledForm').appendChild(ledLabel);
+      document.getElementById('ledForm').appendChild(ledTriggersElem);
+      ledTriggersElem.onchange = changeEventHandler;
+    }, this);
+  }
+});
+
+setInterval(getEnv,1000);
+
+getLeds();
+
+function getEnv(){
+  xhr1.open("GET", "cgi-bin/environment");
+  xhr1.setRequestHeader("cache-control", "no-cache");
+  xhr1.send();
+}
+
+function getLeds(){
+  xhr2.open("GET", "cgi-bin/led_ops");
+  xhr2.setRequestHeader("cache-control", "no-cache");
+  xhr2.send();
+}
+
+function sendTrigger(led,trigger){
+  var xhr3 = new XMLHttpRequest();
+  xhr3.withCredentials = true;
+  xhr3.open("POST","cgi-bin/led_ops");
+  xhr3.setRequestHeader("Content-type", "text/plain");
+  xhr3.setRequestHeader("cache-control", "no-cache");
+  var data = { "led": led, "trigger": trigger };
+  
+  xhr3.addEventListener("readystatechange", function () {
+    if (this.readyState === 4) {
+      getLeds();
+    }
+  });
+  xhr3.send(JSON.stringify(data));
+}
+
+function changeEventHandler(event) {
+    // You can use “this” to refer to the selected element.
+    //if(!event.target.value) alert('Please Select One');
+    //else alert('You like ' + event.target.value + ' ice cream.'); 
+    var ledTrigger = event.target.value.split(",");
+    sendTrigger(ledTrigger[0], ledTrigger[1]);
+}
+
+function removeFormData(form){
+  var i;
+  for( i = form.children.length -1; i >-1 ; i--){
+    form.children[i].remove();
+  }
+}
+
+function removeOptions(selectbox)
+{
+    var i;
+    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+    {
+        selectbox.remove(i);
+    }
+}
+
+</script>
+</html>
